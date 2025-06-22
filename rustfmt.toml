@@ -1,0 +1,38 @@
+version = "Two"                             # 使用最新v2引擎
+max_width = 100                             # 较宽行宽适应现代屏幕
+tab_spaces = 4                              # 与多数Rust项目一致
+newline_style = "Unix"                      # 强制Unix换行符
+
+chain_width = 60                            # 方法链分段宽度
+wrap_comments = true                        # 自动换行长注释
+format_code_in_doc_comments = true          # 格式化文档内代码
+group_imports = "Preserve"                  # 保持导入顺序
+imports_granularity = "Crate"               # 按crate分组导入
+
+
+use_field_init_shorthand = true             # 启用字段简写
+use_try_shorthand = true                    # 使用?简写
+blank_lines_upper_bound = 1                 # 最大空行数
+blank_lines_lower_bound = 0                 # 最小空行数
+format_strings = true                       # 格式化字符串内容
+rename_doc_tests = "Consistent"             # 文档测试命名一致
+
+control_brace_style = "AlwaysSameLine"      # 控制结构括号风格
+overflow_delimited_expr = true              # 溢出表达式特殊处理
+struct_field_align_threshold = 20           # 字段对齐阈值
+match_arm_leading_pipes = "Never"           # 匹配臂不保留前导|
+
+[test]
+imports_layout = "HorizontalVertical"       # 测试导入混合布局
+
+[doc]
+wrap_comments = false                       # 文档注释不自动换行
+comment_width = 80                          # 文档注释宽度限制
+
+format_macro_matchers = true                # 格式化宏匹配器
+format_macro_bodies = true                  # 格式化宏体
+macro_use_ignore = ["serde_derive"]         # 特殊宏忽略列表
+
+required_version = "1.6.0"                  # 要求最新rustfmt版本
+ignore = ["target/**"]                      # 忽略target目录
+color = "Always"                            # 强制彩色输出
