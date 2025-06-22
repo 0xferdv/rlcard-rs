@@ -17,6 +17,8 @@ debug-assertions = true        # 开发断言
 panic = "unwind"               # 完整堆栈回溯
 overflow-checks = true         # 整数溢出检查
 codegen-units = 256            # 最大并行编译
+remap-debuginfo = true         # 确保可重现构建
+rustc-wrapper = "sccache"      # 编译缓存加速
 
 [profile.release]
 opt-level = 3                  # 最大优化
@@ -27,6 +29,7 @@ strip = "symbols"              # 去除符号
 debug = false                  # 无调试信息
 overflow-checks = false        # 禁用溢出检查
 target-cpu = "native"          # 可选: 针对特定CPU优化
+panic-abort-tests = true       # 测试也使用abort
 
 [profile.test]
 opt-level = 1                  # 适度优化
@@ -47,3 +50,11 @@ target-feature = "+avx2,+fma"  # 可选CPU指令集优化
 [profile.doc]
 opt-level = 0                  # 快速文档生成
 incremental = true             # 增量文档构建
+
+[env]
+RUSTFLAGS = "-C target-cpu=native -C embed-bitcode=yes"
+CARGO_PROFILE_RELEASE_CODEGEN_UNITS = "1"
+
+[profile.dev.package."*"]
+opt-level = 0             # 依赖也禁用优化
+incremental = true        # 依赖也启用增量
