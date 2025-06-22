@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = [
+members = [ "crates/bin",
     "crates/conf",
     "crates/env",
     "crates/infra",
@@ -17,24 +17,20 @@ debug-assertions = true        # 开发断言
 panic = "unwind"               # 完整堆栈回溯
 overflow-checks = true         # 整数溢出检查
 codegen-units = 256            # 最大并行编译
-remap-debuginfo = true         # 确保可重现构建
-rustc-wrapper = "sccache"      # 编译缓存加速
 
 [profile.release]
 opt-level = 3                  # 最大优化
 lto = "fat"                    # 全程序LTO
 codegen-units = 1              # 单编译单元
 panic = "abort"                # 最小二进制
-strip = "symbols"              # 去除符号
+strip = false                   # 去除符号
 debug = false                  # 无调试信息
 overflow-checks = false        # 禁用溢出检查
-target-cpu = "native"          # 可选: 针对特定CPU优化
-panic-abort-tests = true       # 测试也使用abort
 
 [profile.test]
 opt-level = 1                  # 适度优化
 debug = 2                      # 保留调试信息
-panic = "unwind"               # 捕获panic
+#panic = "unwind"               # 捕获panic
 incremental = true             # 增量编译
 codegen-units = 16             # 较快编译
 
@@ -42,26 +38,20 @@ codegen-units = 16             # 较快编译
 opt-level = 3                  # 最大优化
 lto = "thin"                   # 平衡LTO
 codegen-units = 1              # 单编译单元
-panic = "abort"                # 同生产
-strip = "symbols"              # 去除符号
+#panic = "abort"                # 同生产
 debug = false                  # 无调试信息
-target-feature = "+avx2,+fma"  # 可选CPU指令集优化
+strip = false                   # 去除符号
 
-[profile.doc]
-opt-level = 0                  # 快速文档生成
-incremental = true             # 增量文档构建
-rustdocflags = [
-    "--html-in-header=docs/assets/header.html",
-    "--enable-index-page",
-    "--document-private-items" # 包含内部文档
-]
+#[profile.doc]
+#opt-level = 0                  # 快速文档生成
+#incremental = true             # 增量文档构建
 
-[env]
-RUSTFLAGS = "-C target-cpu=native -C embed-bitcode=yes"
-CARGO_PROFILE_RELEASE_CODEGEN_UNITS = "1"
-RUSTC_WRAPPER = "sccache"
-CARGO_PROFILE_RELEASE_LTO = "fat"
-CARGO_INCREMENTAL = "0"        # 发布禁用增量
+#[env]
+#RUSTFLAGS = "-C target-cpu=native -C embed-bitcode=yes"
+#CARGO_PROFILE_RELEASE_CODEGEN_UNITS = "1"
+#RUSTC_WRAPPER = "sccache"
+#CARGO_PROFILE_RELEASE_LTO = "fat"
+#CARGO_INCREMENTAL = "0"        # 发布禁用增量
 
 [profile.dev.package."*"]
 opt-level = 0                  # 依赖也禁用优化
