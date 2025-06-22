@@ -1,0 +1,56 @@
+disallowed-macros = ["println!", "dbg!", "eprintln!"]
+disallowed-types = ["LinkedList"]     # 性能敏感场景不推荐
+
+avoid-breaking-iterator-chain = true  # 保护迭代器优化
+avoid-double-checks = true            # 避免重复检查
+borrow-as_ptr = true                  # 强制正确指针转换
+cast-lossless = true                  # 防止数据丢失的强制转换
+cognitive-complexity-threshold = 15   # 认知复杂度上限
+
+
+await-holding-refcell-ref = true      # 异步+RefCell检测
+dereference-by-copying = true         # 避免不必要的引用
+explicit-auto-deref = true            # 明确自动解引用
+floating-point-arithmetic = true      # 浮点运算检查
+
+enum-variant-names = true             # 枚举命名一致性
+exhaustive-enums = true               # 枚举完全匹配
+exhaustive-structs = true             # 结构体完全匹配
+explicit-counter-loop = true          # 明确循环计数器
+fallible-impl-from = true             # 可失败的From实现
+
+float-arithmetic = true               # 浮点运算优化
+float-cmp-const = true                # 浮点常量比较
+implicit-saturating-sub = true        # 隐式饱和减法
+indexing-slicing = true               # 安全索引检查
+integer-division = true               # 整数除法检查
+
+macro-use-extern-crate = true         # 规范宏使用
+manual-while-let-some = true          # 优化while let
+match-like-matches-macro = true       # 匹配优化
+mem-forget = true                     # 内存安全检测
+missing-assert-message = true         # 断言消息检查
+
+missing-docs = true                   # 强制文档注释
+missing-inline = true                 # 内联提示
+must-use-candidate = true             # 必须使用检查
+needless-test-statements = true       # 测试优化
+non-expressive-names = true           # 命名表达性
+
+[msrv]
+msrv = "1.70"                         # 最低支持Rust版本
+
+[test]
+avoid-breaking-iterator-chain = false # 测试中放宽迭代器检查
+disallowed-macros = []                # 测试允许调试宏
+
+[bench]
+arithmetic = false                    # 基准测试放宽数学检查
+float-arithmetic = false              # 基准测试放宽浮点检查
+
+[clippy.pedantic]
+avoid-breaking-iterator-chain = false
+redundant-closure-for-method-calls = false
+
+[package.metadata]
+clippy-rustfmt-sync = true            # 确保与rustfmt规则一致
