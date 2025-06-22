@@ -1,0 +1,111 @@
+name: Rust CI  # 工作流名称，显示在GitHub Actions界面
+
+on:
+  # 触发条件配置
+  push:
+    branches: [ main ]  # 仅main分支的推送触发
+  pull_request:         # 所有PR都会触发
+
+env:
+  # 全局环境变量
+  CARGO_TERM_COLOR: always  # 强制彩色输出
+  RUSTFLAGS: "-D warnings"  # 将警告视为错误
+
+jobs:
+  build:  # 构建检查任务
+    runs-on: ubuntu-latest  # 使用GitHub最新的Ubuntu镜像
+
+    steps:
+    # 第一步：检出代码
+    - uses: actions/checkout@v4  # 官方检出动作，v4是最新稳定版
+
+    # 第二步：安装Rust工具链
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1  # 专业Rust工具链安装器
+      with:
+        toolchain: stable    # 使用稳定版工具链
+        components: rustfmt, clippy  # 额外安装rustfmt和clippy组件
+        override: true       # 覆盖系统预装的Rust版本
+
+    # 第三步：缓存优化（大幅加速后续构建）
+    - uses: Swatinem/rust-cache@v2
+      with:
+        # 缓存键包含操作系统和Cargo.lock哈希，锁定文件变化时自动失效
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+    # 第四步：基础编译检查
+    - name: Cargo check
+      run: cargo check --all-targets  # 快速检查所有目标能否编译
+
+    # 第五步：格式化检查
+    - name: Rustfmt
+      run: cargo fmt --all -- --check  # 检查代码是否符合rustfmt.toml规范
+
+    # 第六步：Clippy静态检查
+    - name: Clippy
+      run: cargo clippy --all-targets -- -D warnings  # 严格执行clippy.toml规则
+
+    # 第七步：单元测试（仅测试库目标）
+    - name: Unit Tests
+      run: cargo test --lib  # 并行运行所有单元测试
+
+    # 第八步：集成测试（仅测试集成测试目标）
+    - name: Integration Tests
+      run: cargo test --tests  # 并行运行所有集成测试
+
+    # 第九步：基准测试编译检查（仅main分支）
+    - name: Benchmarks
+      if: github.ref == 'refs/heads/main'  # 条件执行
+      run: cargo bench --no-run  # 只编译不运行，验证基准测试能否编译
+
+  release:  # 发布任务（依赖build任务成功）
+    needs: build  # 必须等build任务完成
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'  # 仅main分支触发
+
+    steps:
+    - uses: actions/checkout@v4
+
+    # 安装Rust（不额外安装组件）
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        override: true
+
+    - uses: Swatinem/rust-cache@v2
+      with:
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+    # 发布构建（使用Cargo.toml中的release配置）
+    - name: Build Release
+      run: cargo build --release  # 启用所有release优化
+
+    # 文档构建与检查
+    - name: Build Docs
+      run: |
+        # 构建文档（包含私有项）并检查死链
+        cargo doc --no-deps --release --document-private-items
+        cargo deadlinks
+
+    # 版本号检查（防止重复发布）
+    - name: Check Version
+      run: |
+        # 从Cargo.toml提取当前版本和包名
+        CURRENT_VERSION=$(grep -m1 'version' Cargo.toml | cut -d '"' -f2)
+        # 查询crates.io是否已存在该版本
+        curl -s "https://crates.io/api/v1/crates/$(grep -m1 'name' Cargo.toml | cut -d '"' -f2)" | \
+          jq -e --arg v "$CURRENT_VERSION" '.versions[] | select(.num == $v)' && \
+          (echo "Version $CURRENT_VERSION already exists on crates.io" && exit 1) || true
+
+    # 上传发布产物（供后续下载）
+    - name: Upload Release
+      uses: actions/upload-artifact@v3
+      with:
+        name: release-binaries  # 制品名称
+        path: target/release    # 上传整个release目录
+
+    # 发布到crates.io（需要CRATES_IO_TOKEN密钥）
+    - name: Publish to Crates.io
+      if: success()  # 只有前面所有步骤成功才执行
+      run: cargo publish --token ${{ secrets.CRATES_IO_TOKEN }}
