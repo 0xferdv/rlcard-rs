@@ -1,6 +1,7 @@
 [workspace]
 resolver = "2"
 members = [
+    "crates/env",
     "crates/conf",
     "crates/infra",
     "crates/logger",
