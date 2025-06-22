@@ -1,5 +1,5 @@
 [workspace]
 resolver = "2"
-members = [
+members = [ "crates/conf", "crates/infra", "crates/logger",
     "crates/utils"
 ]

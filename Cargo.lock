@@ -3,5 +3,17 @@
 version = 4
 
 [[package]]
+name = "conf"
+version = "0.1.0"
+
+[[package]]
+name = "infra"
+version = "0.1.0"
+
+[[package]]
+name = "logger"
+version = "0.1.0"
+
+[[package]]
 name = "utils"
 version = "0.1.0"
