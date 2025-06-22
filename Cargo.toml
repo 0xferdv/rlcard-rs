@@ -60,3 +60,6 @@ incremental = true             # 依赖也启用增量
 
 [workspace.metadata]
 min_rust_version = "1.75.0"    # 最低工具链要求
+
+[workspace.dependencies]
+burn = { version = "0.17.1", features = ["wgpu"] }
