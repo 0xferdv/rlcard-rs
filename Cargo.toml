@@ -7,10 +7,3 @@ members = [
     "crates/logger",
     "crates/utils"
 ]
-
-
-[workspace.dependencies.dev]
-
-[workspace.dependencies.test]
-
-[workspace.dependencies.release]
