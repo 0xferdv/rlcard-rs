@@ -50,11 +50,23 @@ target-feature = "+avx2,+fma"  # 可选CPU指令集优化
 [profile.doc]
 opt-level = 0                  # 快速文档生成
 incremental = true             # 增量文档构建
+rustdocflags = [
+    "--html-in-header=docs/assets/header.html",
+    "--enable-index-page",
+    "--document-private-items" # 包含内部文档
+]
 
 [env]
 RUSTFLAGS = "-C target-cpu=native -C embed-bitcode=yes"
 CARGO_PROFILE_RELEASE_CODEGEN_UNITS = "1"
+RUSTC_WRAPPER = "sccache"
+CARGO_PROFILE_RELEASE_LTO = "fat"
+CARGO_INCREMENTAL = "0"        # 发布禁用增量
 
 [profile.dev.package."*"]
-opt-level = 0             # 依赖也禁用优化
-incremental = true        # 依赖也启用增量
+opt-level = 0                  # 依赖也禁用优化
+incremental = true             # 依赖也启用增量
+
+
+[workspace.metadata]
+min_rust_version = "1.75.0"    # 最低工具链要求
